@@ -1,8 +1,11 @@
-%.o: %.c
-	$(CC) -c -o $@ $^ -Werror -Wall -Wpedantic
+CFLAGS = -Werror -Wall -Wpedantic -fsanitize=address
+LDFLAGS = -fsanitize=address
 
-kv: kv.o backend.o
-	$(CC) -o $@ $^
+%.o: %.c
+	$(CC) -c -o $@ $^ $(CFLAGS)
+
+kv: kv.o backend.o dll.o
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 all: kv
 

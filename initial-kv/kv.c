@@ -4,7 +4,8 @@
 
 #include "backend.h"
 
-void exec_op_str(Backend backend, char* opstr) {
+// TODO: improve error handling, decrease repetition
+void exec_op_str(backend_t backend, char* opstr) {
 	char* buf = strdup(opstr);
 	char* tokend = buf;
 
@@ -16,7 +17,6 @@ void exec_op_str(Backend backend, char* opstr) {
 
 	switch (cmd[0]) {
 		case 'p': {
-			printf("put\n");
 			char* key = strsep(&tokend, ",");
 			if (key == NULL) {
 				printf("bad command\n");
@@ -58,7 +58,9 @@ void exec_op_str(Backend backend, char* opstr) {
 				break;
 			}
 
-			backend.del(backend.ctx, atoi(key));
+			if (backend.del(backend.ctx, atoi(key)) != 0) {
+				printf("%d not found\n", atoi(key));
+			}
 			
 			break;
 		}
@@ -70,8 +72,8 @@ void exec_op_str(Backend backend, char* opstr) {
 		}
 		
 		case 'a': {
-			printf("ALL unimplemented\n");
-			exit(-1);
+			backend.all(backend.ctx);
+
 			break;
 		}
 		
@@ -87,9 +89,11 @@ int main(int argc, char* argv[]) {
 		return 0; // do nothing if no args
 	}
 
-	Backend backend = logger_backend();
+	backend_t backend = init_list_backend();
 
 	for (int i = 1; i < argc; i++) {
 		exec_op_str(backend, argv[i]);
 	}
+
+	backend.quit(backend.ctx); // cleanup or persistence
 }
