@@ -34,6 +34,9 @@ void list_empty(list* self) {
 		free(node);
 		node = next;
 	}
+	self->head = NULL;
+	self->tail = NULL;
+	self->size = 0;
 }
 
 // empties and then frees a list

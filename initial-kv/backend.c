@@ -156,7 +156,8 @@ int bckend_list_quit(void* ctx_) {
 
 	fclose(f_snapshot);
 
-	list_destroy(&ctx->kvs);
+	list_empty(&ctx->kvs);
+	free(ctx);
 
 	return 0;
 }
