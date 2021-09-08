@@ -72,6 +72,7 @@ void exec_op_str(backend_t backend, char* opstr) {
 		}
 		
 		case 'a': {
+			// TODO: this feels gross
 			backend.all(backend.ctx);
 
 			break;

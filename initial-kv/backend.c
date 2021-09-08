@@ -165,8 +165,8 @@ int bckend_list_quit(void* ctx_) {
 void snapshot_hydrate(backend_t backend) {
 	FILE* f_snapshot = fopen("kv.snapshot", "r");
 	if (!f_snapshot) {
-		perror("snapshot_hydrate: fopen()");
-		exit(1);
+		// if there's no file, that's fine; we just don't have a snapshot to restore from.
+		return;
 	}
 
 	char* line = NULL;
@@ -176,8 +176,11 @@ void snapshot_hydrate(backend_t backend) {
 		char* tok_end = line;
 		char* key = strsep(&tok_end, ",");
 		char* val = tok_end;
+		if (val[strlen(val) - 1] == '\n') val[strlen(val) - 1] = 0;
 
-		backend.put(backend.ctx, atoi(key), val);
+		if (val != NULL) {
+			backend.put(backend.ctx, atoi(key), val);
+		}
 	}
 	free(line);
 
