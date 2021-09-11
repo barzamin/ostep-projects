@@ -195,7 +195,7 @@ backend_t init_list_backend() {
 	}
 
 	list_init(&backend_ctx->kvs);
-	backend_ctx->kvs.dtor = kv_pair_dtor;
+	list_set_dtor(&backend_ctx->kvs, kv_pair_dtor);
 
 	backend_t b = {
 		.ctx = backend_ctx,

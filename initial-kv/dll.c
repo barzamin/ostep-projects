@@ -10,7 +10,6 @@ void list_init(list* self) {
 	self->dtor = NULL;
 }
 
-// allocates and initializes a new list
 list* list_new() {
 	list* l = malloc(sizeof(list));
 	if (!l) {
@@ -23,15 +22,19 @@ list* list_new() {
 	return l;
 }
 
+// calls the dtor of a list node and then frees it
+void list_node_destroy(list_node* self, node_data_dtor* dtor) {
+	if (dtor)
+		dtor(self->data);
+	free(self);
+}
+
 // empties a list, calling each node's dtor in order
 void list_empty(list* self) {
 	list_node* node = self->head;
 	while (node != NULL) {
 		list_node* next = node->next;
-		if (self->dtor) {
-			self->dtor(node->data);
-		}
-		free(node);
+		list_node_destroy(next);
 		node = next;
 	}
 	self->head = NULL;
@@ -58,13 +61,6 @@ list_node* list_node_new(void* data) {
 	self->data = data;
 
 	return self;
-}
-
-// calls the dtor of a list node and then frees it
-void list_node_destroy(list_node* self, node_data_dtor* dtor) {
-	if (dtor)
-		dtor(self->data);
-	free(self);
 }
 
 // sets the item dtor for a list
@@ -224,9 +220,7 @@ void list_remove(list* self, list_node* node) {
 	else
 		self->tail = node->prev;
 
-	if (self->dtor)
-		self->dtor(node->data);
-	free(node);
+	list_node_destroy(node);
 
 	self->size--;
 }
